@@ -4,7 +4,7 @@ module Main exposing (..)
 import Array exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing ( style, type_, value )
-import Html.Events exposing ( onInput )
+import Html.Events exposing ( onClick, onInput )
 import Svg exposing ( path, svg )
 import Svg.Attributes exposing ( d, fill, viewBox )
 
@@ -32,8 +32,6 @@ model : Model
 model =
   Array.fromList
   [ MoveTo { x = "0", y = "0" }
-  , LineTo { x = "60", y = "60" }
-  , LineTo { x = "60", y = "60" }
   ]
 
 
@@ -43,6 +41,9 @@ type Msg =
   | UpdateMoveY Int String String
   | UpdateLineX Int String String
   | UpdateLineY Int String String
+  | NewMove
+  | NewLine
+  | Remove Int
 
 update : Msg -> Model -> Model
 update msg model =
@@ -59,6 +60,15 @@ update msg model =
     UpdateLineY index x y ->
       Array.set index (LineTo { x = x, y = y }) model
 
+    NewMove ->
+      Array.push (MoveTo { x = "0", y = "0" }) model
+
+    NewLine ->
+      Array.push (LineTo { x = "0", y = "0" }) model
+
+    Remove index ->
+      Array.append (Array.slice 0 index model) (Array.slice (index + 1) (Array.length model) model)
+
 -- VIEW
 instructionToString : Instruction -> String
 instructionToString instruction =
@@ -69,43 +79,45 @@ instructionToString instruction =
     LineTo { x, y } ->
       "L" ++ x ++ "," ++ y
 
-renderPath : Model -> Html Msg
-renderPath model =
+generatePath : Model -> String
+generatePath model =
   let
     strings : Array String
     strings =
       Array.map (instructionToString) model
-
-    joined : String
-    joined =
-      Array.foldr (\acc string -> acc ++ " " ++ string) "" strings
   in
-    path [ d joined, fill "none" ] [ ]
+    Array.foldr (\acc string -> acc ++ " " ++ string) "" strings
 
 renderInput : Int -> Instruction -> Html Msg
 renderInput index instruction =
   case instruction of
     MoveTo { x, y } ->
       div [ ] [
-        input [ onInput (UpdateMoveX index y), type_ "number", value (x) ] [ ]
+        span [ ] [ text "Move" ]
+        , input [ onInput (UpdateMoveX index y), type_ "number", value (x) ] [ ]
         , input [ onInput (UpdateMoveY index x), type_ "number", value (y) ] [ ]
+        , button [ onClick (Remove index), type_ "button" ] [ text "X" ]
       ]
     LineTo { x, y } ->
       div [ ] [
-        input [ onInput (UpdateLineX index y), type_ "number", value (x) ] [ ]
+        span [ ] [ text "Line" ]
+        , input [ onInput (UpdateLineX index y), type_ "number", value (x) ] [ ]
         , input [ onInput (UpdateLineY index x), type_ "number", value (y) ] [ ]
+        , button [ onClick (Remove index), type_ "button" ] [ text "X" ]
       ]
 
 view : Model -> Html Msg
 view model =
   div [ ] [
-    -- div [ ] (Array.toList <| Array.indexedMap renderInput model),
-    div [ ] (Array.toList <| Array.indexedMap renderInput model),
-    div [ style boxStyles ] [
+    div [ ] (Array.toList <| Array.indexedMap renderInput model)
+    , button [ onClick NewMove ] [ text "Add Move" ]
+    , button [ onClick NewLine ] [ text "Add Line" ]
+    , div [ style boxStyles ] [
       svg [ style svgStyles, viewBox "0 0 120 120" ] [
-        renderPath model
+        path [ d (generatePath model), fill "none" ] [ ]
       ]
     ]
+    , p [ ] [ text (generatePath model) ]
   ]
 
   -- CSS Styles
