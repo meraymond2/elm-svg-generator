@@ -1,0 +1,25 @@
+## IDE Files
+.idea/
+*.ipr
+*.iws
+*.iml
+
+## Dynamic Node Files
+node_modules/
+package-lock.json
+npm-debug.log
+
+## Webpack Build Files
+dist/
+static/*.js
+static/*.json
+static/*.woff
+static/*.woff2
+static/styles.css
+
+# OSX/Windows Folder Configs
+**/.DS_Store
+**/*.ini
+
+# Elm
+elm-stuff/
