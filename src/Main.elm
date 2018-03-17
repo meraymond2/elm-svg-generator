@@ -1,8 +1,9 @@
 module Main exposing (..)
 
 -- IMPORTS
+import Array exposing (..)
 import Html exposing (..)
-import Html.Attributes exposing ( style )
+import Html.Attributes exposing ( style, value )
 import Html.Events exposing ( onInput )
 import Svg exposing ( path, svg )
 import Svg.Attributes exposing ( d, fill, viewBox )
@@ -14,30 +15,38 @@ main =
 
 
 -- MODEL
-type alias Model = String
+type alias Model = Array String
 
 model : Model
-model = "M0,0 L120,60"
+model =
+  Array.fromList
+  [ "M0,0"
+  , "L120,120"
+  ]
 
 
 -- UPDATE
-type Msg = Path String
+type Msg = Path Int String
 
 update : Msg -> Model -> Model
 update msg model =
   case msg of
-    Path newPath -> newPath
+    Path index newPath -> Array.set index newPath model
 
 
 -- VIEW
 renderPath : Model -> Html Msg
 renderPath model =
-  path [ d model, fill "none" ] [ ]
+  path [ d ( Array.foldr ( \acc str -> acc ++ " " ++ str ) "" model ), fill "none" ] [ ]
+
+renderInput : Int -> String -> Html Msg
+renderInput index string =
+  input [ onInput (Path index), style inputStyles, value string ] [ ]
 
 view : Model -> Html Msg
 view model =
   div [ ] [
-    input [ onInput Path, style inputStyles ] [ ],
+    div [ ] (Array.toList <| Array.indexedMap renderInput model),
     div [ style boxStyles ] [
       svg [ style svgStyles, viewBox "0 0 120 120" ] [
         renderPath model
