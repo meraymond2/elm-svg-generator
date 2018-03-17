@@ -15,35 +15,58 @@ main =
 
 
 -- MODEL
-type Instruction = MoveTo String String | LineTo String String
+type alias MoveCoords =
+  { x : String
+  , y : String
+  }
+
+type alias LineCoords =
+  { x : String
+  , y : String
+  }
+
+type Instruction = MoveTo MoveCoords | LineTo LineCoords
 type alias Model = Array Instruction
 
 model : Model
 model =
   Array.fromList
-  [ MoveTo "0" "0"
-  , LineTo "60" "60"
+  [ MoveTo { x = "0", y = "0" }
+  , LineTo { x = "60", y = "60" }
+  , LineTo { x = "60", y = "60" }
   ]
 
 
 -- UPDATE
-type Msg = MMM
+type Msg =
+  UpdateMoveX Int String String
+  | UpdateMoveY Int String String
+  | UpdateLineX Int String String
+  | UpdateLineY Int String String
 
 update : Msg -> Model -> Model
 update msg model =
   case msg of
-    MMM ->
-      model
+    UpdateMoveX index y x ->
+      Array.set index (MoveTo { x = x, y = y }) model
 
+    UpdateMoveY index x y ->
+      Array.set index (MoveTo { x = x, y = y }) model
+
+    UpdateLineX index y x ->
+      Array.set index (LineTo { x = x, y = y }) model
+
+    UpdateLineY index x y ->
+      Array.set index (LineTo { x = x, y = y }) model
 
 -- VIEW
 instructionToString : Instruction -> String
 instructionToString instruction =
   case instruction of
-    MoveTo x y ->
+    MoveTo { x, y } ->
       "M" ++ x ++ "," ++ y
 
-    LineTo x y ->
+    LineTo { x, y } ->
       "L" ++ x ++ "," ++ y
 
 renderPath : Model -> Html Msg
@@ -62,11 +85,16 @@ renderPath model =
 renderInput : Int -> Instruction -> Html Msg
 renderInput index instruction =
   case instruction of
-    MoveTo x y ->
-      p [] [ text (x ++ y) ]
-    LineTo x y ->
-      p [] [ text (x ++ y) ]
-      -- input [ onInput (Path index), style inputStyles, value string ] [ ]
+    MoveTo { x, y } ->
+      div [ ] [
+        input [ onInput (UpdateMoveX index y), type_ "number", value (x) ] [ ]
+        , input [ onInput (UpdateMoveY index x), type_ "number", value (y) ] [ ]
+      ]
+    LineTo { x, y } ->
+      div [ ] [
+        input [ onInput (UpdateLineX index y), type_ "number", value (x) ] [ ]
+        , input [ onInput (UpdateLineY index x), type_ "number", value (y) ] [ ]
+      ]
 
 view : Model -> Html Msg
 view model =
