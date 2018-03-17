@@ -11,7 +11,7 @@ const html =
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Elm-SVG</title>
-        <link rel="stylesheet" type="text/css" href="/static/styles.css">
+        <!-- <link rel="stylesheet" type="text/css" href="/static/styles.css"> -->
     </head>
     <body>
         <p>Hello</p>
@@ -20,12 +20,6 @@ const html =
     </body>
     </html>
     `
-
-// <div id="react-root"></div>
-// <script>
-//   window.__PRELOADED_STATE__ = ${JSON.stringify(state).replace(/</g, "\\\\\\\\\u003c")}
-// </script>
-// <script src="/static/bundle.js"></script>
 
 app.get("/favicon.ico", express.static("static"))
 app.use("/static", express.static("static"))
