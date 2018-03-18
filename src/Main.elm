@@ -231,35 +231,35 @@ renderInput : Index -> Instruction -> Html Msg
 renderInput index instruction =
   case instruction of
     MoveTo { x, y } ->
-      div [ ] [
+      div [ class "instruction" ] [
         span [ ] [ text "Move" ]
         , input [ onInput (UpdateX index), type_ "number", value (x) ] [ ]
         , input [ onInput (UpdateY index), type_ "number", value (y) ] [ ]
         , button [ onClick (Remove index), type_ "button" ] [ text "X" ]
-        , button [ onClick (Reorder index -1), type_ "button" ] [ text "U" ]
-        , button [ onClick (Reorder index 1), type_ "button" ] [ text "D" ]
+        , button [ onClick (Reorder index -1), type_ "button" ] [ text "Up" ]
+        , button [ onClick (Reorder index 1), type_ "button" ] [ text "Down" ]
       ]
 
     LineTo { x, y } ->
-      div [ ] [
+      div [ class "instruction" ] [
         span [ ] [ text "Line" ]
         , input [ onInput (UpdateX index), type_ "number", value (x) ] [ ]
         , input [ onInput (UpdateY index), type_ "number", value (y) ] [ ]
         , button [ onClick (Remove index), type_ "button" ] [ text "X" ]
-        , button [ onClick (Reorder index -1), type_ "button" ] [ text "U" ]
-        , button [ onClick (Reorder index 1), type_ "button" ] [ text "D" ]
+        , button [ onClick (Reorder index -1), type_ "button" ] [ text "Up" ]
+        , button [ onClick (Reorder index 1), type_ "button" ] [ text "Down" ]
       ]
 
     CubicCurve contP destP ->
-      div [ ] [
+      div [ class "instruction" ] [
         span [ ] [ text "Cubic Bezier Curve" ]
         , input [ onInput (UpdateCPX index), type_ "number", value (contP.x) ] [ ]
         , input [ onInput (UpdateCPY index), type_ "number", value (contP.y) ] [ ]
         , input [ onInput (UpdateX index), type_ "number", value (destP.x) ] [ ]
         , input [ onInput (UpdateY index), type_ "number", value (destP.y) ] [ ]
         , button [ onClick (Remove index), type_ "button" ] [ text "X" ]
-        , button [ onClick (Reorder index -1), type_ "button" ] [ text "U" ]
-        , button [ onClick (Reorder index 1), type_ "button" ] [ text "D" ]
+        , button [ onClick (Reorder index -1), type_ "button" ] [ text "Up" ]
+        , button [ onClick (Reorder index 1), type_ "button" ] [ text "Down" ]
       ]
 
 
@@ -267,10 +267,12 @@ view : Model -> Html Msg
 view model =
   div [ class "layout" ] [
     div [ class "left" ] [
-      div [ ] (Array.toList <| Array.indexedMap renderInput model)
-      , button [ onClick NewMove ] [ text "Add Move" ]
-      , button [ onClick NewLine ] [ text "Add Line" ]
-      , button [ onClick NewCubicCurve ] [ text "Add CubicCurve" ]
+      div [ class "buttons" ] [
+          button [ onClick NewMove ] [ text "Add Move" ]
+        , button [ onClick NewLine ] [ text "Add Line" ]
+        , button [ onClick NewCubicCurve ] [ text "Add CubicCurve" ]
+      ]
+      , div [ ] (Array.toList <| Array.indexedMap renderInput model)
     ]
     , div [ class "right" ] [
       div [ class "viewBox" ] [
