@@ -21,7 +21,9 @@ type alias Point =
   , y : String
   }
 
-type Instruction = MoveTo Point | LineTo Point
+type alias ControlPoint = Point
+
+type Instruction = MoveTo Point | LineTo Point | CubicCurve ControlPoint Point
 
 type alias Model = Array Instruction
 
@@ -43,10 +45,20 @@ type alias Shift = Int
 type Msg
   = UpdateX Index Coord
   | UpdateY Index Coord
+  | UpdateCPX Index Coord
+  | UpdateCPY Index Coord
   | NewMove
   | NewLine
+  | NewCubicCurve
   | Remove Index
   | Reorder Index Shift
+
+
+startingPoint : Point
+startingPoint =
+  { x = "0"
+  , y = "0"
+  }
 
 
 updateX : Coord -> Maybe Instruction -> Instruction
@@ -58,8 +70,11 @@ updateX newX instruction =
     Just (LineTo coords) ->
       LineTo { coords | x = newX }
 
+    Just (CubicCurve controlCoords destCoords) ->
+      CubicCurve controlCoords { destCoords | x = newX }
+
     Nothing ->
-      MoveTo { x = "0", y = "0" }
+      MoveTo startingPoint
 
 
 updateY : Coord -> Maybe Instruction -> Instruction
@@ -71,8 +86,31 @@ updateY newY instruction =
     Just (LineTo coords) ->
       LineTo { coords | y = newY }
 
+    Just (CubicCurve controlCoords destCoords) ->
+      CubicCurve controlCoords { destCoords | y = newY }
+
     Nothing ->
-      MoveTo { x = "0", y = "0" }
+      MoveTo startingPoint
+
+
+updateCPX : Coord -> Maybe Instruction -> Instruction
+updateCPX newX instruction =
+  case instruction of
+    Just (CubicCurve contP destP) ->
+      CubicCurve { contP | x = newX } destP
+
+    _ ->
+      MoveTo startingPoint
+
+
+updateCPY : Coord -> Maybe Instruction -> Instruction
+updateCPY newY instruction =
+  case instruction of
+    Just (CubicCurve contP destP) ->
+      CubicCurve { contP | y = newY } destP
+
+    _ ->
+      MoveTo startingPoint
 
 
 update : Msg -> Model -> Model
@@ -93,11 +131,28 @@ update msg model =
       in
         Array.set index next model
 
+    UpdateCPX index x ->
+      let
+        next : Instruction
+        next = updateCPX x (Array.get index model)
+      in
+        Array.set index next model
+
+    UpdateCPY index y->
+      let
+        next : Instruction
+        next = updateCPY y (Array.get index model)
+      in
+        Array.set index next model
+
     NewMove ->
-      Array.push (MoveTo { x = "0", y = "0" }) model
+      Array.push (MoveTo startingPoint) model
 
     NewLine ->
-      Array.push (LineTo { x = "0", y = "0" }) model
+      Array.push (LineTo startingPoint) model
+
+    NewCubicCurve ->
+      Array.push (CubicCurve startingPoint startingPoint) model
 
     Remove index ->
       Array.append (Array.slice 0 index model) (Array.slice (index + 1) (Array.length model) model)
@@ -128,6 +183,9 @@ instructionToString instruction =
     LineTo { x, y } ->
       "L" ++ x ++ "," ++ y
 
+    CubicCurve contP destP ->
+      "Q" ++ contP.x ++ "," ++ contP.y ++ " " ++ destP.x ++ "," ++ destP.y
+
 
 generatePath : Model -> String
 generatePath model =
@@ -151,11 +209,24 @@ renderInput index instruction =
         , button [ onClick (Reorder index -1), type_ "button" ] [ text "U" ]
         , button [ onClick (Reorder index 1), type_ "button" ] [ text "D" ]
       ]
+
     LineTo { x, y } ->
       div [ ] [
         span [ ] [ text "Line" ]
         , input [ onInput (UpdateX index), type_ "number", value (x) ] [ ]
         , input [ onInput (UpdateY index), type_ "number", value (y) ] [ ]
+        , button [ onClick (Remove index), type_ "button" ] [ text "X" ]
+        , button [ onClick (Reorder index -1), type_ "button" ] [ text "U" ]
+        , button [ onClick (Reorder index 1), type_ "button" ] [ text "D" ]
+      ]
+
+    CubicCurve contP destP ->
+      div [ ] [
+        span [ ] [ text "Cubic Bezier Curve" ]
+        , input [ onInput (UpdateCPX index), type_ "number", value (contP.x) ] [ ]
+        , input [ onInput (UpdateCPY index), type_ "number", value (contP.y) ] [ ]
+        , input [ onInput (UpdateX index), type_ "number", value (destP.x) ] [ ]
+        , input [ onInput (UpdateY index), type_ "number", value (destP.y) ] [ ]
         , button [ onClick (Remove index), type_ "button" ] [ text "X" ]
         , button [ onClick (Reorder index -1), type_ "button" ] [ text "U" ]
         , button [ onClick (Reorder index 1), type_ "button" ] [ text "D" ]
@@ -167,6 +238,7 @@ view model =
     div [ ] (Array.toList <| Array.indexedMap renderInput model)
     , button [ onClick NewMove ] [ text "Add Move" ]
     , button [ onClick NewLine ] [ text "Add Line" ]
+    , button [ onClick NewCubicCurve ] [ text "Add CubicCurve" ]
     , div [ style boxStyles ] [
       svg [ style svgStyles, viewBox "0 0 120 120" ] [
         path [ d (generatePath model), fill "none" ] [ ]
