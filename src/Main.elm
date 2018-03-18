@@ -15,18 +15,15 @@ main =
 
 
 -- MODEL
-type alias MoveCoords =
+type alias Point =
   { x : String
   , y : String
   }
 
-type alias LineCoords =
-  { x : String
-  , y : String
-  }
 
-type Instruction = MoveTo MoveCoords | LineTo LineCoords
+type Instruction = MoveTo Point | LineTo Point
 type alias Model = Array Instruction
+
 
 model : Model
 model =
@@ -38,20 +35,11 @@ model =
 -- UPDATE
 type Msg =
   UpdateX Int String
-  | UpdateMoveY Int String String
-  | UpdateLineY Int String String
+  | UpdateY Int String
   | NewMove
   | NewLine
   | Remove Int
 
--- updateX : String -> Instruction -> Instruction
--- updateX newX instruction =
---   case instruction of
---     MoveTo coords ->
---       MoveTo { coords | x = newX }
---
---     LineTo coords ->
---       LineTo { coords | x = newX }
 
 updateX : String -> Maybe Instruction -> Instruction
 updateX newX instruction =
@@ -65,27 +53,35 @@ updateX newX instruction =
     Nothing ->
       MoveTo { x = "0", y = "0" }
 
+updateY : String -> Maybe Instruction -> Instruction
+updateY newY instruction =
+  case instruction of
+    Just (MoveTo coords) ->
+      MoveTo { coords | y = newY }
+
+    Just (LineTo coords) ->
+      LineTo { coords | y = newY }
+
+    Nothing ->
+      MoveTo { x = "0", y = "0" }
+
 update : Msg -> Model -> Model
 update msg model =
   case msg of
     UpdateX index x ->
       let
-        toUpdate : Maybe Instruction
-        toUpdate =
-          Array.get index model
-
         next : Instruction
         next =
-          updateX x toUpdate
-
+          updateX x (Array.get index model)
       in
         Array.set index next model
 
-    UpdateMoveY index x y ->
-      Array.set index (MoveTo { x = x, y = y }) model
-
-    UpdateLineY index x y ->
-      Array.set index (LineTo { x = x, y = y }) model
+    UpdateY index y ->
+      let
+        next : Instruction
+        next = updateY y (Array.get index model)
+      in
+        Array.set index next model
 
     NewMove ->
       Array.push (MoveTo { x = "0", y = "0" }) model
@@ -122,14 +118,14 @@ renderInput index instruction =
       div [ ] [
         span [ ] [ text "Move" ]
         , input [ onInput (UpdateX index), type_ "number", value (x) ] [ ]
-        , input [ onInput (UpdateMoveY index x), type_ "number", value (y) ] [ ]
+        , input [ onInput (UpdateY index), type_ "number", value (y) ] [ ]
         , button [ onClick (Remove index), type_ "button" ] [ text "X" ]
       ]
     LineTo { x, y } ->
       div [ ] [
         span [ ] [ text "Line" ]
         , input [ onInput (UpdateX index), type_ "number", value (x) ] [ ]
-        , input [ onInput (UpdateLineY index x), type_ "number", value (y) ] [ ]
+        , input [ onInput (UpdateY index), type_ "number", value (y) ] [ ]
         , button [ onClick (Remove index), type_ "button" ] [ text "X" ]
       ]
 
