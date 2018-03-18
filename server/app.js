@@ -14,7 +14,6 @@ const html =
         <!-- <link rel="stylesheet" type="text/css" href="/static/styles.css"> -->
     </head>
     <body>
-        <p>Hello</p>
         <div id="elm-main"></div>
         <script src="/static/bundle.js"></script>
     </body>
