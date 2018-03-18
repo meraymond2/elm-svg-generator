@@ -8,6 +8,7 @@ import Html.Events exposing ( onClick, onInput )
 import Svg exposing ( path, svg )
 import Svg.Attributes exposing ( d, fill, viewBox )
 
+
 -- APP
 main : Program Never Model Msg
 main =
@@ -20,31 +21,35 @@ type alias Point =
   , y : String
   }
 
-
 type Instruction = MoveTo Point | LineTo Point
+
 type alias Model = Array Instruction
 
 
 model : Model
 model =
-  Array.fromList
-  [ MoveTo { x = "0", y = "0" }
+  Array.fromList [
+    MoveTo { x = "0", y = "0" }
   ]
 
 
 -- UPDATE
 type alias Index = Int
+
+type alias Coord = String
+
 type alias Shift = Int
-type Msg =
-  UpdateX Int String
-  | UpdateY Int String
+
+type Msg
+  = UpdateX Index Coord
+  | UpdateY Index Coord
   | NewMove
   | NewLine
-  | Remove Int
+  | Remove Index
   | Reorder Index Shift
 
 
-updateX : String -> Maybe Instruction -> Instruction
+updateX : Coord -> Maybe Instruction -> Instruction
 updateX newX instruction =
   case instruction of
     Just (MoveTo coords) ->
@@ -56,7 +61,8 @@ updateX newX instruction =
     Nothing ->
       MoveTo { x = "0", y = "0" }
 
-updateY : String -> Maybe Instruction -> Instruction
+
+updateY : Coord -> Maybe Instruction -> Instruction
 updateY newY instruction =
   case instruction of
     Just (MoveTo coords) ->
@@ -67,8 +73,6 @@ updateY newY instruction =
 
     Nothing ->
       MoveTo { x = "0", y = "0" }
-
-
 
 
 update : Msg -> Model -> Model
@@ -113,6 +117,7 @@ update msg model =
       in
         newModel
 
+
 -- VIEW
 instructionToString : Instruction -> String
 instructionToString instruction =
@@ -123,6 +128,7 @@ instructionToString instruction =
     LineTo { x, y } ->
       "L" ++ x ++ "," ++ y
 
+
 generatePath : Model -> String
 generatePath model =
   let
@@ -132,7 +138,8 @@ generatePath model =
   in
     Array.foldr (\acc string -> acc ++ " " ++ string) "" strings
 
-renderInput : Int -> Instruction -> Html Msg
+
+renderInput : Index -> Instruction -> Html Msg
 renderInput index instruction =
   case instruction of
     MoveTo { x, y } ->
