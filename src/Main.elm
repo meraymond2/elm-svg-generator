@@ -82,6 +82,7 @@ type Msg
   | NewCubicCurve
   | Remove Index
   | Reorder Index Shift
+  | SetBin
 
 
 startingPoint : Point
@@ -202,6 +203,8 @@ update msg model =
       in
         newModel
 
+    SetBin ->
+      bin
 
 -- VIEW
 instructionToString : Instruction -> String
@@ -271,6 +274,7 @@ view model =
           button [ onClick NewMove ] [ text "Add Move" ]
         , button [ onClick NewLine ] [ text "Add Line" ]
         , button [ onClick NewCubicCurve ] [ text "Add CubicCurve" ]
+        , button [ onClick SetBin ] [ text "See Example" ]
       ]
       , div [ ] (Array.toList <| Array.indexedMap renderInput model)
     ]
