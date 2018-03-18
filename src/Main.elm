@@ -37,25 +37,52 @@ model =
 
 -- UPDATE
 type Msg =
-  UpdateMoveX Int String String
+  UpdateX Int String
   | UpdateMoveY Int String String
-  | UpdateLineX Int String String
   | UpdateLineY Int String String
   | NewMove
   | NewLine
   | Remove Int
 
+-- updateX : String -> Instruction -> Instruction
+-- updateX newX instruction =
+--   case instruction of
+--     MoveTo coords ->
+--       MoveTo { coords | x = newX }
+--
+--     LineTo coords ->
+--       LineTo { coords | x = newX }
+
+updateX : String -> Maybe Instruction -> Instruction
+updateX newX instruction =
+  case instruction of
+    Just (MoveTo coords) ->
+      MoveTo { coords | x = newX }
+
+    Just (LineTo coords) ->
+      LineTo { coords | x = newX }
+
+    Nothing ->
+      MoveTo { x = "0", y = "0" }
+
 update : Msg -> Model -> Model
 update msg model =
   case msg of
-    UpdateMoveX index y x ->
-      Array.set index (MoveTo { x = x, y = y }) model
+    UpdateX index x ->
+      let
+        toUpdate : Maybe Instruction
+        toUpdate =
+          Array.get index model
+
+        next : Instruction
+        next =
+          updateX x toUpdate
+
+      in
+        Array.set index next model
 
     UpdateMoveY index x y ->
       Array.set index (MoveTo { x = x, y = y }) model
-
-    UpdateLineX index y x ->
-      Array.set index (LineTo { x = x, y = y }) model
 
     UpdateLineY index x y ->
       Array.set index (LineTo { x = x, y = y }) model
@@ -94,14 +121,14 @@ renderInput index instruction =
     MoveTo { x, y } ->
       div [ ] [
         span [ ] [ text "Move" ]
-        , input [ onInput (UpdateMoveX index y), type_ "number", value (x) ] [ ]
+        , input [ onInput (UpdateX index), type_ "number", value (x) ] [ ]
         , input [ onInput (UpdateMoveY index x), type_ "number", value (y) ] [ ]
         , button [ onClick (Remove index), type_ "button" ] [ text "X" ]
       ]
     LineTo { x, y } ->
       div [ ] [
         span [ ] [ text "Line" ]
-        , input [ onInput (UpdateLineX index y), type_ "number", value (x) ] [ ]
+        , input [ onInput (UpdateX index), type_ "number", value (x) ] [ ]
         , input [ onInput (UpdateLineY index x), type_ "number", value (y) ] [ ]
         , button [ onClick (Remove index), type_ "button" ] [ text "X" ]
       ]
