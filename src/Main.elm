@@ -3,7 +3,7 @@ module Main exposing (..)
 -- IMPORTS
 import Array exposing (..)
 import Html exposing (..)
-import Html.Attributes exposing ( style, type_, value )
+import Html.Attributes exposing ( class, type_, value )
 import Html.Events exposing ( onClick, onInput )
 import Svg exposing ( path, svg )
 import Svg.Attributes exposing ( d, fill, viewBox )
@@ -262,37 +262,26 @@ renderInput index instruction =
         , button [ onClick (Reorder index 1), type_ "button" ] [ text "D" ]
       ]
 
+
 view : Model -> Html Msg
 view model =
-  div [ ] [
-    div [ ] (Array.toList <| Array.indexedMap renderInput model)
-    , button [ onClick NewMove ] [ text "Add Move" ]
-    , button [ onClick NewLine ] [ text "Add Line" ]
-    , button [ onClick NewCubicCurve ] [ text "Add CubicCurve" ]
-    , div [ style boxStyles ] [
-      svg [ style svgStyles, viewBox "0 0 120 120" ] [
-        path [ d (generatePath model), fill "none" ] [ ]
+  div [ class "layout" ] [
+    div [ class "left" ] [
+      div [ ] (Array.toList <| Array.indexedMap renderInput model)
+      , button [ onClick NewMove ] [ text "Add Move" ]
+      , button [ onClick NewLine ] [ text "Add Line" ]
+      , button [ onClick NewCubicCurve ] [ text "Add CubicCurve" ]
+    ]
+    , div [ class "right" ] [
+      div [ class "viewBox" ] [
+        svg [ viewBox "0 0 120 120" ] [
+          path [ d (generatePath model), fill "none" ] [ ]
+        ]
+      ]
+      , div [ class "codeBox" ] [
+        p [ ] [ text "<svg class=\"svg\" viewBox=\"0 0 120 120\">" ]
+        , p [ ] [ text ("<path d=\"" ++ (generatePath model) ++ "\" />") ]
+        , p [ ] [ text "</svg>"]
       ]
     ]
-    , p [ ] [ text (generatePath model) ]
-  ]
-
-  -- CSS Styles
-inputStyles : List ( String, String )
-inputStyles =
-  [ ("margin-bottom", "20px")
-  ]
-
-boxStyles : List ( String, String )
-boxStyles =
-  [ ("background-color", "navy")
-  , ("height", "200px")
-  , ("width", "200px")
-  ]
-
-svgStyles : List ( String, String )
-svgStyles =
-  [ ("stroke", "white")
-  , ("stroke-linecap", "round")
-  , ("stroke-width", "5px")
   ]
