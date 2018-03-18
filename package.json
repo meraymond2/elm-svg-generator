@@ -5,6 +5,8 @@
   "scripts": {
     "build": "webpack --config webpack.prod.js",
     "start": "webpack --watch --config webpack.dev.js",
+    "elm-install": "elm-package install",
+    "elm-repl": "elm-repl",
     "lint": "elm-lint"
   },
   "dependencies": {
