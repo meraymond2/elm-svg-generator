@@ -15,7 +15,7 @@ static/*.js
 static/*.json
 static/*.woff
 static/*.woff2
-static/styles.css
+#static/styles.css
 
 # OSX/Windows Folder Configs
 **/.DS_Store

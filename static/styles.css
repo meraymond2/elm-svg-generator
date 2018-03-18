@@ -1,0 +1,88 @@
+html, body, div, p {
+  font-family: monospace, monospace;
+  margin: 0;
+}
+
+.layout {
+  display: flex;
+}
+
+.left {
+  display: flex;
+  background-color: #222222;
+  color: white;
+  flex-direction: column;
+  padding: 50px;
+  width: 50%;
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+}
+
+.buttons button {
+  background-color: #444444;
+  border: 1px solid white;
+  border-radius: 5px;
+  color: white;
+  margin: 20px;
+  padding: 10px;
+}
+
+.instruction {
+  align-items: center;
+  display: flex;
+  margin-top: 20px;
+}
+
+.instruction input {
+  background-color: #444444;
+  border: 1px solid black;
+  border-radius: 5px;
+  color: white;
+  margin-left: 20px;
+  text-align: right;
+  width: 50px;
+}
+
+.instruction button {
+  background-color: #444444;
+  border: 1px solid black;
+  border-radius: 5px;
+  color: white;
+  margin-left: 20px;
+}
+
+.right {
+  align-items: center;
+  background-color: #EEEEEE;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  justify-content: center;
+  width: 50%;
+}
+
+.viewBox {
+  background-color: white;
+  height: 500px;
+  width: 500px;
+}
+
+.viewBox svg {
+  stroke: black;
+  stroke-linecap: round;
+  stroke-width: 5;
+}
+
+.codeBox {
+  background-color: #CCCCCC;
+  box-sizing: border-box;
+  padding: 50px;
+  width: 500px;
+}
+
+.codeBox p:nth-child(2) {
+  padding-left: 30px;
+}
