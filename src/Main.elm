@@ -28,10 +28,40 @@ type Instruction = MoveTo Point | LineTo Point | CubicCurve ControlPoint Point
 type alias Model = Array Instruction
 
 
+bin : Model
+bin =
+  Array.fromList [
+    MoveTo { x = "48", y = "18" }
+    , CubicCurve { x = "48", y = "6" } { x = "60", y = "6" }
+    , CubicCurve { x = "72", y = "6" } { x = "72", y = "18" }
+    , MoveTo { x = "24", y = "18" }
+    , LineTo { x = "96", y = "18" }
+    , CubicCurve { x = "102", y = "18" } { x = "102", y = "24" }
+    , LineTo { x = "102", y = "30" }
+    , CubicCurve { x = "102", y = "36" } { x = "96", y = "36" }
+    , LineTo { x = "24", y = "36" }
+    , CubicCurve { x = "18", y = "36" } { x = "18", y = "30" }
+    , LineTo { x = "18", y = "24" }
+    , CubicCurve { x = "18", y = "18" } { x = "24", y = "18" }
+    , MoveTo { x = "48", y = "48" }
+    , LineTo { x = "48", y = "102" }
+    , MoveTo { x = "60", y = "48" }
+    , LineTo { x = "60", y = "102" }
+    , MoveTo { x = "72", y = "48" }
+    , LineTo { x = "72", y = "102" }
+    , MoveTo { x = "30", y = "36" }
+    , LineTo { x = "30", y = "108" }
+    , CubicCurve { x = "30", y = "114" } { x = "36", y = "114" }
+    , LineTo { x = "84", y = "114" }
+    , CubicCurve { x = "90", y = "114" } { x = "90", y = "108" }
+    , LineTo { x = "90", y = "36" }
+  ]
+
+
 model : Model
 model =
   Array.fromList [
-    MoveTo { x = "0", y = "0" }
+    MoveTo startingPoint
   ]
 
 
