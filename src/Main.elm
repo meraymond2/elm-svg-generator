@@ -33,12 +33,15 @@ model =
 
 
 -- UPDATE
+type alias Index = Int
+type alias Shift = Int
 type Msg =
   UpdateX Int String
   | UpdateY Int String
   | NewMove
   | NewLine
   | Remove Int
+  | Reorder Index Shift
 
 
 updateX : String -> Maybe Instruction -> Instruction
@@ -64,6 +67,9 @@ updateY newY instruction =
 
     Nothing ->
       MoveTo { x = "0", y = "0" }
+
+
+
 
 update : Msg -> Model -> Model
 update msg model =
@@ -91,6 +97,21 @@ update msg model =
 
     Remove index ->
       Array.append (Array.slice 0 index model) (Array.slice (index + 1) (Array.length model) model)
+
+    Reorder index shift ->
+      let
+        before : Maybe Instruction
+        before = Array.get index model
+        after : Maybe Instruction
+        after = Array.get (index + shift) model
+        newModel =
+          case (before, after) of
+            (Just beforeVal, Just afterVal) ->
+              Array.set index afterVal (Array.set (index + shift) beforeVal model)
+            _ ->
+              model
+      in
+        newModel
 
 -- VIEW
 instructionToString : Instruction -> String
@@ -120,6 +141,8 @@ renderInput index instruction =
         , input [ onInput (UpdateX index), type_ "number", value (x) ] [ ]
         , input [ onInput (UpdateY index), type_ "number", value (y) ] [ ]
         , button [ onClick (Remove index), type_ "button" ] [ text "X" ]
+        , button [ onClick (Reorder index -1), type_ "button" ] [ text "U" ]
+        , button [ onClick (Reorder index 1), type_ "button" ] [ text "D" ]
       ]
     LineTo { x, y } ->
       div [ ] [
@@ -127,6 +150,8 @@ renderInput index instruction =
         , input [ onInput (UpdateX index), type_ "number", value (x) ] [ ]
         , input [ onInput (UpdateY index), type_ "number", value (y) ] [ ]
         , button [ onClick (Remove index), type_ "button" ] [ text "X" ]
+        , button [ onClick (Reorder index -1), type_ "button" ] [ text "U" ]
+        , button [ onClick (Reorder index 1), type_ "button" ] [ text "D" ]
       ]
 
 view : Model -> Html Msg
